@@ -62,7 +62,7 @@ function Header() {
     <AppBar
       position="static"
       sx={{
-        backgroundColor: "#d35400", // 🍊 Restaurant orange
+        backgroundColor: "#ec6c17", // 🍊 Restaurant orange
         boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
       }}
     >
