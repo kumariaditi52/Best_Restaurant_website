@@ -120,7 +120,7 @@ function Register() {
         <Box component="form" onSubmit={handleRegister} noValidate>
           <TextField
             label="Full Name"
-            placeholder="e.g. Aditi Singh"
+            placeholder="e.g. name"
             fullWidth
             margin="normal"
             value={name}
