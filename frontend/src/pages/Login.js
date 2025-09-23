@@ -1,105 +1,122 @@
-// import React, { useState, useContext } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { TextField, Button, Container, Typography, Box } from "@mui/material";
-// import { AuthContext } from "../AuthContext";
-
-// function Login() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const navigate = useNavigate();
-//   const { setIsAuthenticated, setUser } = useContext(AuthContext);
-
-//   const handleLogin = (e) => {
-//     e.preventDefault();
-//     const storedUser = JSON.parse(localStorage.getItem("user"));
-
-//     if (storedUser && storedUser.email === email && storedUser.password === password) {
-//       setIsAuthenticated(true);
-//       setUser(storedUser);
-//       navigate("/home"); // ✅ Redirect to Home
-//     } else {
-//       alert("Invalid credentials");
-//     }
-//   };
-
-//   return (
-//     <Container maxWidth="xs">
-//       <Box sx={{ mt: 5 }}>
-//         <Typography variant="h4" align="center" gutterBottom>
-//           Login
-//         </Typography>
-//         <form onSubmit={handleLogin}>
-//           <TextField
-//             label="Email"
-//             type="email"
-//             fullWidth
-//             margin="normal"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//           />
-//           <TextField
-//             label="Password"
-//             type="password"
-//             fullWidth
-//             margin="normal"
-//             value={password}
-//             onChange={(e) => setPassword(e.target.value)}
-//           />
-//           <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
-//             Login
-//           </Button>
-//         </form>
-//       </Box>
-//     </Container>
-//   );
-// }
-
-// export default Login;
-
-
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Typography, Box, Paper } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Alert,
+  CircularProgress
+} from "@mui/material";
 import { AuthContext } from "../AuthContext";
 
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useContext(AuthContext);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-    if (storedUser && storedUser.email === email && storedUser.password === password) {
-      setIsAuthenticated(true);
-      setUser(storedUser);
-      navigate("/home");
-    } else {
-      alert("Invalid credentials");
+  const validate = () => {
+    if (!email.trim() || !password) {
+      setErrorMsg("Please enter email and password.");
+      return false;
+    }
+    const emailRe = /\S+@\S+\.\S+/;
+    if (!emailRe.test(email)) {
+      setErrorMsg("Please enter a valid email.");
+      return false;
+    }
+    setErrorMsg("");
+    return true;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // save token + user
+      if (data.token && data.user) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // update context
+        setIsAuthenticated(true);
+        setUser(data.user);
+
+        // navigate to protected home
+        navigate("/home");
+      } else {
+        setErrorMsg("Login failed: invalid response from server.");
+      }
+
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrorMsg("Server error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={6} sx={{ p: 4, mt: 8, borderRadius: 3, backgroundColor: "#fff8f0" }}>
+    <Container maxWidth="xs" sx={{ mb: 6 }}>
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          mt: 8,
+          borderRadius: 3,
+          backgroundColor: "#fff8f0"
+        }}
+      >
         <Typography variant="h4" align="center" gutterBottom sx={{ color: "#d35400" }}>
-          🍕 Login
+          🍕 Welcome Back
         </Typography>
+
         <Typography align="center" sx={{ color: "#7f8c8d", mb: 2 }}>
-          Login to explore our tasty menu
+          Login to continue ordering delicious food
         </Typography>
-        <form onSubmit={handleLogin}>
+
+        {errorMsg && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errorMsg}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleLogin} noValidate>
           <TextField
             label="Email Address"
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             type="email"
             fullWidth
             margin="normal"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoFocus
           />
+
           <TextField
             label="Password"
             placeholder="Enter your password"
@@ -109,19 +126,36 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 2, bgcolor: "#e67e22", "&:hover": { bgcolor: "#d35400" } }}
+            sx={{
+              mt: 2,
+              bgcolor: "#e67e22",
+              "&:hover": { bgcolor: "#d35400" },
+              py: 1.2,
+            }}
+            disabled={loading}
           >
-            Login
+            {loading ? <CircularProgress size={22} color="inherit" /> : "Login"}
           </Button>
-        </form>
+
+          <Typography align="center" sx={{ mt: 2, color: "#7f8c8d" }}>
+            New here?{" "}
+            <Box
+              component="span"
+              onClick={() => navigate("/")}
+              sx={{ color: "#d35400", cursor: "pointer", fontWeight: "bold" }}
+            >
+              Create an account
+            </Box>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
 }
 
 export default Login;
-
