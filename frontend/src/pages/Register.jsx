@@ -13,7 +13,7 @@ import {
 import { AuthContext } from "../AuthContext";
 
 // backend base URL (set REACT_APP_API_URL in .env if different)
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function Register() {
   const navigate = useNavigate();

@@ -12,8 +12,7 @@ import {
 } from "@mui/material";
 import { AuthContext } from "../AuthContext";
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 function Login() {
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useContext(AuthContext);

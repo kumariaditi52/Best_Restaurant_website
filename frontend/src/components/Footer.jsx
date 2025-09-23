@@ -1,16 +1,3 @@
-// import React from "react";
-// import { Box, Typography } from "@mui/material";
-
-// function Footer() {
-//   return (
-//     <Box sx={{ bgcolor: "#1976d2", color: "white", p: 2, mt: 5, textAlign: "center" }}>
-//       <Typography variant="body2">© 2025 MyApp. All rights reserved.</Typography>
-//     </Box>
-//   );
-// }
-
-// export default Footer;
-
 
 import React from "react";
 import { Box, Typography, Link, Grid } from "@mui/material";
@@ -41,41 +28,7 @@ function Footer() {
           </Typography>
         </Grid>
 
-        {/* Column 2 - Links */}
-        <Grid item xs={12} md={4} textAlign="center">
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
-            Quick Links
-          </Typography>
-          <Box>
-            <Link href="/home" color="inherit" underline="hover" sx={{ mx: 1 }}>
-              Home
-            </Link>
-            <Link
-              href="/services"
-              color="inherit"
-              underline="hover"
-              sx={{ mx: 1 }}
-            >
-              Services
-            </Link>
-            <Link
-              href="/about"
-              color="inherit"
-              underline="hover"
-              sx={{ mx: 1 }}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              color="inherit"
-              underline="hover"
-              sx={{ mx: 1 }}
-            >
-              Contact
-            </Link>
-          </Box>
-        </Grid>
+        
 
         {/* Column 3 - Contact */}
         <Grid item xs={12} md={4} textAlign="center">
